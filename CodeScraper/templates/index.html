@@ -7,10 +7,19 @@
 </head>
 <body>
   <h1>CodeScraper</h1><br>
-  <form action="/result" method="post">
-    <h4>Please Enter the URL of the problem.</h4>
-    <input type="url" name="url" style="width:300px;">
-    <input type="submit" value="Go and Get Code">
+  <h3>Gets other's source code for problem you're stuck on.</h4>
+  <h3>BOJ only available for now.</h4>
+  <form action="/process" method="post">{% csrf_token %}
+    <p>Select Language : </p>
+    <ul>
+      <li><input type="radio" name="lang" value="C">C</li>
+      <li><input type="radio" name="lang" value="C++">C++</li>
+      <li><input type="radio" name="lang" value="Python">Python</li>
+      <li><input type="radio" name="lang" value="Java">Java</li>
+    </ul>
+    <p>Enter URL of the problem : </p>
+    <input type="url" name="oj_url" style="width:300px;">
+    <input type="submit" value="Submit and Get Code">
   </form>
 </body>
 </html>

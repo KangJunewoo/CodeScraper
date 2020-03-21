@@ -12,8 +12,10 @@
   <h1>CodeScraper Result</h1><br>
   <h4>Question ID : {{q_id}}</h4>
   <h4>Language : {{lang}}</h4>
-  <div id="codeList">
+  {% for codes in code_list%}
+  <div class="codeList">
     {{codes}}
   </div>
+  {% endfor %}
 </body>
 </html>

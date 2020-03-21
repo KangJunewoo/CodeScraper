@@ -7,12 +7,11 @@ from requests import get
 
 # Create your views here.
 
+code_list = []
 
 def index(request):
+  code_list = []
   return render(request, 'index.html')
-
-codes_list = []
-codes = "Not Found.. Sorry"
 
 def process(request):
   base_url = "https://search.naver.com/search.naver?where=webkr&sm=mtv_jum&ie-utf8&query="
@@ -27,6 +26,7 @@ def process(request):
   target_url_a = soup.find("div", {"class":"sp_website section"}).find("ul").find_all("a", {"class":"title_link"})
   for target in target_url_a :
     target_url_list.append(target.get("href"))
+  codes_list = []
   for url in target_url_list:
     result = requests.get(url, headers={ 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'})
     result.encoding = "utf-8"
@@ -37,19 +37,21 @@ def process(request):
       codes_list.append(soup.find_all("div", {"class":"colorscripter-code"}))
     elif soup.find("div", {"class":"se_code"}):
       print("got __se_code_view")
-      codes_list.append(soup.find("div", {"class":"se_code"}))
+      codes_list.append(soup.find_all("div", {"class":"se_code"}))
     elif soup.find("table", {"class":"highlight"}):
       print("got highlightjs")
       codes_list.append(soup.find_all("table", {"class":"highlight"}))
-   #       왠진 모르겠지만 se_code랑 highlightjs가 포함된 html들은 제대로 긁혀 오지가 않네요..
+#왠진 모르겠지만 se_code랑 highlightjs가 포함된 html들은 제대로 긁혀 오지가 않네요..
     elif soup.find("code"):
       print("got code")
       codes_list.append(soup.find_all("code"))
     else:
       continue
-  codes = "<br>".join(codes_list)
+  for codes in codes_list:
+    code_list.append(str(codes)[1:-1])
+    print(type(str(codes)))
   return redirect('result', lang=lang, q_id=q_id)
   #return redirect(f'result/{lang}/{q_id}')
 
 def result(request, lang, q_id):
-  return render(request, 'result.html', {'q_id':q_id, 'lang':lang, 'codes':codes})
+  return render(request, 'result.html', {'q_id':q_id, 'lang':lang, 'code_list':code_list})

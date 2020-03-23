@@ -17,7 +17,7 @@ def process(request):
   base_url = "https://search.naver.com/search.naver?where=webkr&sm=mtv_jum&ie-utf8&query="
   q_id=request.POST['oj_url'].split('/')[-1]
   lang=request.POST['lang']
-  search_url = base_url + "백준+" + q_id +"번+"+lang
+  search_url = base_url + "백준+" + q_id +"+"+lang
 
   result = requests.get(search_url, headers={ 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'})
   result.encoding = "utf-8"
@@ -54,4 +54,5 @@ def process(request):
   #return redirect(f'result/{lang}/{q_id}')
 
 def result(request, lang, q_id):
+  #print(code_list)
   return render(request, 'result.html', {'q_id':q_id, 'lang':lang, 'code_list':code_list})

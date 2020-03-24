@@ -65,7 +65,8 @@ def process(request):
     else:
       continue
   for codes in codes_list:
-    code_list.append(str(codes)[1:-1])
+    #여기를 lstrip하면 왼쪽 공백이 사라질 줄 알았는데ㅜㅜ
+    code_list.append(str(codes)[1:-1].lstrip())
     print(type(str(codes)))
   return redirect('result', lang=lang, q_id=q_id)
   #return redirect(f'result/{lang}/{q_id}')

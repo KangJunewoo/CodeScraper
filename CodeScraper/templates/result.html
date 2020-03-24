@@ -4,8 +4,9 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet"
-      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/default.min.css">
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/agate.min.css">
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
   <title>CodeScraper Result</title>
 </head>
 <body>
@@ -14,9 +15,9 @@
   <h4>Language : {{lang}}</h4>
   <a href="/">Go Home</a>
   {% for codes in code_list%}
-  <div class="codeList">
-    {{codes | safe}}
-  </div>
+    <pre><code>
+      {{codes | safe}}
+    </code></pre>
   {% endfor %}
 </body>
 </html>

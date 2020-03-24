@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
-import requests, ssl, urllib, traceback
+#from .forms import PostForm
+import requests
+import urllib.request as req
 from bs4 import BeautifulSoup
 from requests import get
 
@@ -12,37 +14,18 @@ def index(request):
   return render(request, 'index.html')
 
 def process(request):
-  base_url = "https://www.google.co.kr/search"
+  base_url = "https://search.naver.com/search.naver?where=webkr&sm=mtv_jum&ie-utf8&query="
   q_id=request.POST['oj_url'].split('/')[-1]
   lang=request.POST['lang']
-  searching = f"백준 {q_id} {lang}"
+  search_url = base_url + "백준+" + q_id +"+"+lang
 
-  values={
-    'q':searching,
-    'oq':searching,
-    'aqs':'chrome..69i57.35694j0j7',
-    'sourceid':'chrome',
-    'ie':'UTF-8',
-  }
-
-  hdr={'User-Agent':'Mozilla/5.0'}
-
-  querystring=urllib.parse.urlencode(values)
-  req=urllib.request.Request(base_url+'?'+querystring, headers=hdr)
-  context=ssl._create_unverified_context()
-  try:
-    res=urllib.request.urlopen(req, context=context)
-  except:
-    traceback.print_exc()
-
-  soup=BeautifulSoup(res.read(), 'html.parser')
-  #print(soup.prettify('utf-8'))
-  targets = soup.find_all('a')[17:27]
-  target_url_list=[]
-  for target in targets:
-    target_url_list.append('https://www.google.com'+target.get("href"))
-  #print(target_url_list)
-  #return redirect('result', lang=lang, q_id=q_id)
+  result = requests.get(search_url, headers={ 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'})
+  result.encoding = "utf-8"
+  soup = BeautifulSoup(result.content.decode("utf-8"), "html.parser")
+  target_url_list = []
+  target_url_a = soup.find("div", {"class":"sp_website section"}).find("ul").find_all("a", {"class":"title_link"})
+  for target in target_url_a :
+    target_url_list.append(target.get("href"))
   codes_list = []
   for url in target_url_list:
     result = requests.get(url, headers={ 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'})

@@ -1,26 +1,33 @@
-#imports
-from django.shortcuts import render, redirect
+from flask import Flask, render_template, request, redirect, send_file
 import requests, ssl, urllib, traceback
 from bs4 import BeautifulSoup
-from requests import get
 
-#result에 띄울 코드들의 리스트
-code_list = []
+app = Flask('CodeScraper')
 
-#code_list 초기화해준 뒤 index 렌더링.
-def index(request):
-  code_list.clear()
-  print("list cleared")
-  return render(request, 'index.html')
+code_db={}
+code_list=[]
 
-#코드 크롤링 과정
-def process(request):
-  #쿼리스트링을 만들어 구글검색 돌릴 준비
-  base_url = "https://www.google.co.kr/search"
-  q_id=request.POST['oj_url'].split('/')[-1]
-  lang=request.POST['lang']
-  searching = f"백준 {q_id} {lang}"
+@app.route('/')
+def index():
+  return render_template('index.html')
 
+@app.route('/result', methods=['POST'])
+def result():
+  global code_list, code_db
+  code_list=[]
+
+  base_url='https://www.google.co.kr/search'
+  q_id=request.form['oj_url'].split('/')[-1]
+  lang=request.form['lang']
+  searching=f'백준 {q_id} {lang}'
+  
+  #해당 문제번호+언어가 db에 존재하면, 그대로 load.
+  if q_id+lang in code_db:
+    print('Already in DB😙')
+    code_list=code_db[q_id+lang]
+    return render_template('result.html', q_id=q_id, lang=lang, code_list=code_list)
+  
+  #db에 존재하지 않을 경우, scrapping 시작.
   values={
     'q':searching,
     'oq':searching,
@@ -71,9 +78,9 @@ def process(request):
     else:
       continue
   
-  #처리를 마치면, result로 리다이렉트
-  return redirect('result', lang=lang, q_id=q_id)
+  #db에 저장 후 render.
+  code_db[q_id+lang]=code_list
+  return render_template('result.html', q_id=q_id, lang=lang, code_list=code_list)
 
-#크롤링을 마친 결과 리스트를 보여줍니다.
-def result(request, lang, q_id):
-  return render(request, 'result.html', {'q_id':q_id, 'lang':lang, 'code_list':code_list})
+if __name__ == "__main__":
+  app.run(debug = True)
